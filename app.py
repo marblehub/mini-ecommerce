@@ -1,7 +1,9 @@
 from models.order import Order, OrderItem
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file, abort
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 import json
+from math import ceil
+from datetime import datetime, timedelta
 
 from config import Config
 from models.user import db, User
@@ -88,7 +90,6 @@ def add_to_cart(product_id):
 
 
 # ---------- Cart routes ----------
-from flask import request, redirect, url_for, render_template, flash
 
 @app.route("/cart")
 @login_required
@@ -100,8 +101,7 @@ def view_cart():
         message=""
     )
 
-from datetime import datetime, timedelta
-import random
+
 
 
 @app.route("/cart", methods=["POST"])
@@ -205,11 +205,9 @@ def decrease_qty(product_id):
     return redirect(url_for("view_cart"))
 
 
-from flask import send_file
 from reportlab.platypus import SimpleDocTemplate, Paragraph, ListItem, ListFlowable
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
-import os
     
 
 @app.route("/invoice/<int:order_id>")
@@ -284,7 +282,6 @@ def logout():
 
 
 # ---------- Admin ----------
-from flask import abort
 @app.route("/admin")
 @login_required
 def admin_dashboard():
@@ -330,7 +327,7 @@ def register_admin():
         flash(f"Admin user '{username}' created successfully!")
         return redirect(url_for("admin"))
 
-    return render_template("admin.html", users=users, orders=orders)
+    return render_template("register_admin.html")
 
 
 @app.route("/admin/update_status/<int:order_id>", methods=["POST"])
