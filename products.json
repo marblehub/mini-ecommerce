@@ -1,0 +1,20 @@
+[
+    {"id": 1, "name": "Wireless Mouse", "price": 25.99, "type": "physical", "image": "mouse.png", "rating": 4},
+    {"id": 2, "name": "Mechanical Keyboard", "price": 79.99, "type": "physical", "image": "keyboard.jpg", "rating": 3},
+    {"id": 3, "name": "Laptop Stand", "price": 45.50, "type": "physical", "image": "laptop_stand.jpg", "rating": 5},
+    {"id": 4, "name": "E-book: Python Basics", "price": 9.99, "type": "digital", "image": "ebook_python.jpg", "rating": 2},
+    {"id": 5, "name": "Online Course: Flask Web Dev", "price": 49.99, "type": "digital", "image": "course_flask.jpg", "rating": 4},
+    {"id": 6, "name": "Graphic Design Templates", "price": 29.99, "type": "digital", "image": "templates.png", "rating": 3},
+    {"id": 7, "name": "Monthly Magazine Subscription", "price": 12.99, "type": "subscription", "image": "magazine.jpg", "rating": 3},
+    {"id": 8, "name": "Music Streaming Subscription", "price": 9.99, "type": "subscription", "image": "music_stream.jpg", "rating": 5},
+    {"id": 9, "name": "Cloud Storage Subscription", "price": 19.99, "type": "subscription", "image": "cloud_storage.jpg", "rating": 4},
+    {"id": 10, "name": "Desk Lamp", "price": 34.99, "type": "physical", "image": "desk_lamp.jpg", "rating": 2},
+    {"id": 11, "name": "Notebook", "price": 5.99, "type": "physical", "image": "notebook.jpg", "rating": 5},
+    {"id": 12, "name": "USB-C Hub", "price": 22.50, "type": "physical", "image": "usbc_hub.jpg", "rating": 3},
+    {"id": 13, "name": "Python Book", "price": 30, "type": "physical", "image": "book.jpg", "rating": 2},
+    {"id": 14, "name": "Python eBook", "price": 15, "type": "digital", "image": "ebook.jpg", "rating": 4},
+    {"id": 15, "name": "Python Subscription", "price": 10, "type": "subscription", "image": "subscription.png", "rating": 5},
+    {"id": 16, "name": "Laptop PC", "price": 100, "type": "digital", "image": "laptop.png", "rating": 4},
+    {"id": 17, "name": "Mouse Pad", "price": 10, "type": "mouse", "image": "mousepad.png", "rating": 3},
+    {"id": 18, "name": "Flash Drive", "price": 20, "type": "drives", "image": "flashdrive.png", "rating": 4}
+]

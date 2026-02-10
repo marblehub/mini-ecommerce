@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="checkout-container">
+
+<!-- LEFT SIDE: Items + Shipping + Payment -->
+<div class="checkout-left">
+
+    <h2 class="section-title">Review your order</h2>
+
+    {% if items %}
+		{% for item in items %}
+	<div class="cart-item">
+		<img src="/static/images/{{ item.image }}" class="thumb">
+
+		<div class="item-info">
+			<h4>{{ item.name }}</h4>
+			<p class="item-price">€{{ item.price }}</p>
+
+			<div class="qty-controls">
+				<a href="/cart/decrease/{{ item.id }}" class="qty-btn">−</a>
+				<span class="qty-number">{{ item.qty }}</span>
+				<a href="/cart/increase/{{ item.id }}" class="qty-btn">+</a>
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+
+    {% else %}
+        <p>Your cart is empty.</p>
+    {% endif %}
+
+    <a href="/" class="continue-shopping">← Continue shopping</a>
+
+    <hr>
+
+    <!-- SHIPPING -->
+    <h3 class="section-title">Shipping address</h3>
+    <form method="POST" action="{{ url_for('checkout_cart') }}">
+        <div class="form-grid">
+            <input type="text" name="address" placeholder="Street address" required>
+            <input type="text" name="city" placeholder="City" required>
+            <input type="text" name="zip" placeholder="ZIP code" required>
+        </div>
+
+        <h3 class="section-title">Delivery company</h3>
+        <select name="delivery_company" class="select-field">
+            <option>DHL</option>
+            <option>UPS</option>
+            <option>FedEx</option>
+            <option>Hermes</option>
+            <option>Amazon</option>
+        </select>
+
+        <h3 class="section-title">Payment method</h3>
+        <div class="payment-options">
+            <label>
+                <input type="radio" name="payment" value="card" checked>
+                Credit/Debit Card
+            </label>
+            <label>
+                <input type="radio" name="payment" value="paypal">
+                PayPal
+            </label>
+            <label>
+                <input type="radio" name="payment" value="bitcoin">
+                Bitcoin
+            </label>
+            <label>
+                <input type="radio" name="payment" value="banktransfer">
+                Bank Transfer
+            </label>
+        </div>
+
+</div>
+
+<!-- RIGHT SIDE: Order Summary -->
+<div class="checkout-right">
+
+    <div class="summary-box">
+        <h3>Order Summary</h3>
+
+        <div class="summary-row">
+            <span>Items:</span>
+            <span>€{{ total }}</span>
+        </div>
+
+        <div class="summary-row">
+            <span>Shipping:</span>
+            <span>Free</span>
+        </div>
+        
+        <div class="summary-row">
+            <span>VAT(19%):</span>
+            <span>€{{ 0.19*total }}</span>
+        </div>
+
+        <hr>
+
+        <div class="summary-total">
+            <span>Total:</span>
+            <span>€{{ total + 0.19*total }}</span>
+        </div>
+
+        <button type="submit" class="place-order-btn">
+            Place your order
+        </button>
+
+    </div>
+
+    </form>
+</div>
+
+</div>
+{% endblock %}

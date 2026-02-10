@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3 class="mb-4 text-center fw-semibold">Your Shopping Cart</h3>
+
+{% if items %}
+<div class="row g-3">
+    {% for item in items %}
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 position-relative">
+            <img src="/static/images/{{ item.image }}" class="card-img-top" style="height:200px; object-fit:cover;">
+            <div class="card-body">
+                <h5 class="card-title">{{ item.name }}</h5>
+                <p class="card-text fw-semibold">€{{ item.price }}</p>
+                <a href="/cart/delete/{{ item.id }}" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2">Delete</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="mt-4">
+    <h4 class="fw-bold">Total: €{{ total }}</h4>
+
+    <form method="post" class="mt-3">
+        <div class="mb-3">
+            <label class="form-label">Select Payment Method:</label>
+            <select name="payment" class="form-select" required onchange="toggleShipment(this.value)">
+                <option value="" disabled selected>Select Payment</option>
+                <option value="card">Credit Card</option>
+                <option value="paypal">PayPal</option>
+                <option value="bitcoin">Bitcoin</option>
+                <option value="banktransfer">Bank Transfer</option>
+            </select>
+        </div>
+
+        <div id="shipment-field" style="display:none;">
+            <h5 class="mt-3">Shipment Details</h5>
+            <input type="text" name="address" class="form-control mb-2" placeholder="Shipping Address" required>
+            <input type="text" name="city" class="form-control mb-2" placeholder="City" required>
+            <input type="text" name="zip" class="form-control mb-2" placeholder="ZIP / Postal Code" required>
+            <label for="delivery_company">Delivery Company</label>
+				<select name="delivery_company" required>
+					<option value="">Select a company</option>
+					<option value="DHL">DHL</option>
+					<option value="UPS">UPS</option>
+					<option value="FedEx">FedEx</option>
+					<option value="Hermes">Hermes</option>
+					<option value="Amazon">Amazon</option>
+				</select>
+
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">Buy Now</button>
+        <a href="/" class="btn btn-outline-primary w-100 mt-2">Continue Shopping</a>
+    </form>
+
+    {% if message %}
+    <div class="alert alert-info mt-4 shadow-sm">
+        {{ message }}
+    </div>
+    {% endif %}
+</div>
+
+{% else %}
+<p class="text-center text-muted mt-5">Your cart is empty. Go back to <a href="/">shop products</a>.</p>
+{% endif %}
+
+<script>
+function toggleShipment(payment) {
+    let shipment = document.getElementById("shipment-field");
+    if(payment) {
+        shipment.style.display = "block";
+    } else {
+        shipment.style.display = "none";
+    }
+}
+</script>
+
+{% endblock %}
+
+<div style="display:flex; gap:30px;">
+
+    <!-- LEFT: CART ITEMS -->
+    <div style="flex:2;">
+        <h2>Your Cart</h2>
+        {% for item in items %}
+        <div class="card" style="padding:15px; margin-bottom:10px;">
+            <strong>{{ item.name }}</strong>
+            <p>${{ item.price }}</p>
+            <a href="/cart/delete/{{ item.id }}">Remove</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- RIGHT: CHECKOUT -->
+    <div style="flex:1;">
+        <div class="card" style="padding:20px;">
+            <h3>Order Summary</h3>
+            <p>Total: <strong>${{ total }}</strong></p>
+
+<!--
+            <form method="POST" action="/cart">
+
+                <h4>Shipping Address</h4>
+                <input name="address" placeholder="Address" required>
+                <input name="city" placeholder="City" required>
+                <input name="zip" placeholder="ZIP Code" required>
+
+                <h4>Delivery Company</h4>
+                <select name="delivery_company" required>
+                    <option value="">Select courier</option>
+                    <option>DHL</option>
+                    <option>UPS</option>
+                    <option>FedEx</option>
+                    <option>Hermes</option>
+                </select>
+
+                <h4>Payment</h4>
+                <select name="payment" required>
+                    <option value="card">Credit Card</option>
+                    <option value="paypal">PayPal</option>
+                    <option value="bitcoin">Bitcoin</option>
+                    <option value="banktransfer">Bank Transfer</option>
+                </select>
+
+                <button type="submit" style="margin-top:15px;">
+                    Place Order
+                </button>
+            </form>
+-->
+
+			<form method="POST" action="/cart">
+
+				<h4>Shipping Address</h4>
+				<input name="address" placeholder="Address" required>
+				<input name="city" placeholder="City" required>
+				<input name="zip" placeholder="ZIP Code" required>
+
+				<h4>Delivery Company</h4>
+				<select name="delivery_company" required>
+					<option value="">Select courier</option>
+					<option value="DHL">DHL</option>
+					<option value="UPS">UPS</option>
+					<option value="FedEx">FedEx</option>
+					<option value="Hermes">Hermes</option>
+				</select>
+
+				<h4>Payment</h4>
+				<select name="payment" required>
+					<option value="card">Credit Card</option>
+					<option value="paypal">PayPal</option>
+					<option value="bitcoin">Bitcoin</option>
+					<option value="banktransfer">Bank Transfer</option>
+				</select>
+
+				<button type="submit">Place Order</button>
+			</form>
+
+        </div>
+    </div>
+</div>
+

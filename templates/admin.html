@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container my-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Admin Dashboard</h2>
+        <div class="badge bg-success fs-5">
+            Total Revenue: €{{ total_revenue }}
+        </div>
+    </div>
+
+    <div class="card shadow-lg border-0">
+        <div class="card-body">
+
+            <h4 class="mb-3">Orders</h4>
+
+            <div class="table-responsive">
+                <table class="table align-middle table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Order</th>
+                            <th>User</th>
+                            <th>Total</th>
+                            <th>Courier</th>
+                            <th>Delivery Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>#{{ order.id }}</td>
+                            <td>{{ order.user.email }}</td>
+                            <td>€{{ order.total }}</td>
+                            <td>{{ order.delivery_company }}</td>
+                            <td>{{ order.delivery_date }}</td>
+
+                            <!-- Status dropdown -->
+                            <td>
+                                <form method="POST" action="/admin/update_status/{{ order.id }}">
+                                    <select name="status" class="form-select form-select-sm"
+                                            onchange="this.form.submit()">
+                                        {% for s in ["Confirmed","Shipped","Out for Delivery","Delivered"] %}
+                                        <option value="{{ s }}"
+                                            {% if order.status == s %}selected{% endif %}>
+                                            {{ s }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </form>
+                            </td>
+
+                            <!-- Delete button -->
+                            <td>
+                                <form method="POST" action="/admin/delete_order/{{ order.id }}">
+                                    <button class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Delete this order?')">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

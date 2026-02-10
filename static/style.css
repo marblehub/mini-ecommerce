@@ -1,0 +1,240 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8f9fa; /* light gray */
+}
+
+.navbar {
+    background-color: #000080; /* navbar blue */
+}
+
+.font-inter {
+    font-family: 'Inter', sans-serif;
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border: none;
+}
+
+.btn-success {
+    background-color: #198754;
+    border: none;
+}
+
+input::placeholder {
+    color: #6c757d;
+}
+
+a {
+    color: #0d6efd;
+}
+
+a:hover {
+    color: #0a58ca;
+}
+
+/* Cards hover effect */
+.card:hover {
+    transform: translateY(-3px);
+    transition: 0.2s ease-in-out;
+}
+
+/* Product cards for cart */
+.card img {
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+/* Checkout form styling */
+.form-select {
+    border-radius: 8px;
+}
+
+/* Table styling */
+.table thead {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.badge {
+    font-size: 0.9rem;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 10px;
+}
+
+/* Responsive spacing */
+@media (max-width: 768px) {
+    .row.g-3 > .col-md-4 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* Buttons adjustments */
+.btn-outline-primary {
+    border-radius: 8px;
+}
+
+.btn-success, .btn-outline-primary {
+    font-weight: 600;
+}
+
+/* Card delete button */
+.card .btn-danger {
+    border-radius: 50%;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+}
+
+/* ===== Amazon-style checkout ===== */
+
+.checkout-container {
+    display: flex;
+    gap: 30px;
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.checkout-left {
+    flex: 2;
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.checkout-right {
+    flex: 1;
+}
+
+.section-title {
+    margin: 20px 0 10px;
+    font-weight: 600;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.item-price {
+    font-weight: bold;
+    color: #111;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    color: #007185;
+    cursor: pointer;
+}
+
+.remove-btn:hover {
+    text-decoration: underline;
+}
+
+.continue-shopping {
+    display: inline-block;
+    margin-top: 15px;
+    color: #007185;
+    text-decoration: none;
+}
+
+.form-grid {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.form-grid input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.select-field {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.payment-options label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.summary-box {
+    background: white;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    position: sticky;
+    top: 20px;
+}
+
+.summary-row,
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    margin: 8px 0;
+}
+
+.summary-total {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.place-order-btn {
+    width: 100%;
+    background: #ffd814;
+    border: 1px solid #fcd200;
+    padding: 12px;
+    margin-top: 15px;
+    font-weight: bold;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.place-order-btn:hover {
+    background: #f7ca00;
+}
+
+
+.thumb {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.cart-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.qty-btn {
+    background: #f0f0f0;
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    color: #111;
+}

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container my-5">
+    <div class="card shadow-lg border-0 p-4">
+        <!-- Success Header -->
+        <div class="text-center mb-4">
+            <div class="display-4 text-success">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <h2 class="fw-bold mt-2">Order Successful!</h2>
+            <p class="lead">Your order <strong>#{{ order.id }}</strong> has been placed successfully.</p>
+            <!-- Order status badge -->
+			<span class="badge bg-success fs-6">Confirmed</span>
+        </div>
+        
+<!-- Order Status Progress -->
+{% set steps = ["Confirmed", "Shipped", "Out for Delivery", "Delivered"] %}
+<div class="my-4">
+    <div class="d-flex justify-content-between align-items-center">
+        {% for step in steps %}
+        <div class="text-center">
+            <div class="badge p-2 
+                {% if steps.index(step) <= steps.index(order.status) %}
+                    bg-success
+                {% else %}
+                    bg-secondary
+                {% endif %}
+            ">
+                {{ step }}
+            </div>
+        </div>
+        {% if not loop.last %}
+        <div class="flex-fill border-top mx-2"></div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+
+        <hr>
+
+        <!-- Order Items -->
+        <h4 class="mb-3">Order Summary</h4>
+        <div class="table-responsive mb-3">
+            <table class="table align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Item</th>
+                        <th scope="col">Name</th>
+                        <th scope="col" class="text-center">Quantity</th>
+                        <th scope="col" class="text-end">Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items %}
+                    <tr>
+                        <td>
+							<img src="{{ url_for('static', filename='images/' ~ (item.product_image or 'placeholder.png')) }}" alt="{{ item.product_name }}" class="img-thumbnail" style="width:60px; height:60px; object-fit:cover;">
+                        </td>
+                        <td>{{ item.product_name }}</td>
+                        <td class="text-center">{{ item.quantity }}</td>
+                        <td class="text-end">€{{ item.price*item.quantity }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr class="table-light">
+                        <td colspan="3" class="text-end fw-bold">Total:</td>
+                        <td class="text-end fw-bold">€{{ order.total + 0.19*order.total}} <span style="font-style: italic; font-size: smaller;">(VAT inclusive.)</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Shipping Details -->
+        <h4 class="mb-3">Shipping Details</h4>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p class="mb-1"><strong>Address:</strong> {{ order.address }}</p>
+                <p class="mb-1"><strong>City / ZIP:</strong> {{ order.city }}, {{ order.zip_code }}</p>
+                <p class="mb-1"><strong>Courier:</strong> {{ order.delivery_company }}</p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-1"><strong>Estimated Delivery:</strong> {{ order.delivery_date }}</p>
+                <p class="mb-1"><strong>Payment Method:</strong> {{ order.payment_method | default('N/A') }}</p>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
+            <a href="/invoice/{{ order.id }}" class="btn btn-primary btn-lg">
+                <i class="bi bi-file-earmark-pdf-fill"></i> Download Invoice (PDF)
+            </a>
+            <a href="/" class="btn btn-outline-secondary btn-lg">
+                <i class="bi bi-arrow-left-circle-fill"></i> Continue Shopping
+            </a>
+            <a href="/track" class="btn btn-success btn-lg">
+				<i class="bi bi-truck"></i> Track Order
+			</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

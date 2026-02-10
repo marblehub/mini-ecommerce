@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mini Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="bg-light font-inter">
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">Mini Store<sup>™</sup></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse ms-auto" id="navbarNav">
+            <div class="ms-auto d-flex align-items-center gap-2">
+                {% if current_user.is_authenticated %}
+                    <!-- Cart -->
+                    <a class="btn btn-outline-light" href="/cart">
+                        <i class="bi bi-cart"></i> Cart
+                    </a>
+
+                    <!-- Track Order -->
+                    <a class="btn btn-outline-light" href="/track">
+                        <i class="bi bi-truck"></i> Track Order
+                    </a>
+
+                    <!-- Admin (only for admins) -->
+                    {% if current_user.is_admin %}
+                    <a class="btn btn-warning" href="/admin">
+                        <i class="bi bi-speedometer2"></i> Admin
+                    </a>
+                    {% endif %}
+
+                    <!-- Logout -->
+                    <a class="btn btn-outline-light" href="/logout">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                {% else %}
+                    <!-- Login/Register -->
+                    <a class="btn btn-outline-light" href="/login">Login</a>
+                    <a class="btn btn-success" href="/register">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="container mt-5">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert alert-info text-center">
+                {{ messages[0] }}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</div>
+
+<!-- Footer -->
+<footer class="bg-primary text-white text-center py-3 mt-5">
+    &copy; {{ current_year | default(2026) }} Mini Store. All rights reserved.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

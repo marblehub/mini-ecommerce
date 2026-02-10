@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container my-5">
+    <h2 class="mb-4 text-center">Our Products</h2>
+
+    {% if products %}
+        <div class="row">
+            {% for product in products %}
+                {% if loop.index0 % 6 == 0 and loop.index0 != 0 %}
+                    </div><div class="row mt-4">
+                {% endif %}
+
+                <div class="col-md-4 mb-4 d-flex justify-content-center">
+                    <div class="card h-100 text-center" style="width: 400px;">
+                        <!-- Product Image -->
+                        <img src="/static/images/{{ product.image or 'placeholder.png' }}" 
+                             alt="{{ product.name }}" class="img-thumbnail" 
+                             style="width:330px; height:300px; margin:auto; display:block;">
+
+                        <div class="card-body">
+                            <!-- Product Name & Price -->
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">€{{ product.price }}</p>
+
+                            <!-- Star Rating -->
+                            <p>
+                                {% for i in range(1, 6) %}
+                                    {% if i <= product.rating %}
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    {% else %}
+                                        <i class="bi bi-star text-warning"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </p>
+
+                            <!-- Action Button -->
+                            {% if current_user.is_authenticated %}
+                                <a href="/add/{{ product.id }}" class="btn btn-primary btn-sm">Add to Cart</a>
+                            {% else %}
+                                <a href="/login" class="btn btn-secondary btn-sm">Login to Buy</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="d-flex justify-content-center mt-4">
+            {% if page > 1 %}
+                <a href="{{ url_for('index', page=page-1) }}" class="btn btn-outline-primary me-2">Previous</a>
+            {% endif %}
+            {% if page < total_pages %}
+                <a href="{{ url_for('index', page=page+1) }}" class="btn btn-outline-primary">Next</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <p class="text-center">No products available.</p>
+    {% endif %}
+</div>
+
+{% endblock %}
