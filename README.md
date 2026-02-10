@@ -56,3 +56,8 @@ Create an admin user via the registration route or script.
 - Email notifications
 - Product search and filtering
 - Deployment to cloud platform
+
+## Contributing
+We welcome contributions from the community. If you would like to improve this project, please feel free to fork the repository and submit a pull request.
+To ensure a smooth contribution process, kindly review the [Contributing Guidelines](CONTRIBUTING.md) before making any changes.
+
