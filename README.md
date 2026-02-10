@@ -46,6 +46,11 @@ A full-stack e-commerce web application built with Flask, featuring:
 ## Admin Access
 Create an admin user via the registration route or script.
 
+## Screenshots
+![Home](static/screenshots/home.png)
+![Home](static/screenshots/home-loggedin.png)
+![Admin](static/screenshots/admin-page.png)
+
 ## Future Improvements
 - Payment gateway integration
 - Email notifications
