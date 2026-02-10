@@ -1,16 +1,3 @@
-Here is a **professional, GitHub-ready `CONTRIBUTING.md`** file for your Flask e-commerce project.
-You can copy this directly into a file named:
-
-```
-CONTRIBUTING.md
-```
-
-in your project root.
-
----
-
-# CONTRIBUTING.md
-
 ## Contributing to Mini Store
 
 Thank you for your interest in contributing to **Mini Store**.
