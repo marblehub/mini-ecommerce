@@ -54,11 +54,6 @@ payments = {
 }
 
 
-#@app.route("/")
-#def index():
-#    return render_template("index.html", products=products.values())
-
-
 from math import ceil
 
 @app.route("/")
@@ -338,19 +333,6 @@ def register_admin():
     return render_template("admin.html", users=users, orders=orders)
 
 
-# @app.route("/admin/order/<int:order_id>/<status>")
-# @login_required
-# def update_order_status(order_id, status):
-    # if not current_user.is_admin:
-        # return "Access denied"
-
-    # order = Order.query.get_or_404(order_id)
-    # order.status = status
-    # db.session.commit()
-
-    # return f"Order {order_id} updated to {status}"
-
-
 @app.route("/admin/update_status/<int:order_id>", methods=["POST"])
 @login_required
 def update_order_status(order_id):
@@ -384,9 +366,6 @@ def delete_order(order_id):
 
 
 if __name__ == "__main__":
-	#with app.app_context():
-	#	db.create_all()
-		# app.py (at the bottom, inside if __name__ == "__main__": block)
 	with app.app_context():
 		db.create_all()  # make sure tables exist
 
