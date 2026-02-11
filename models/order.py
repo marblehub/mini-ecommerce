@@ -13,7 +13,7 @@ class Order(db.Model):
     delivery_company = db.Column(db.String(50))
     delivery_date = db.Column(db.String(50))
     total = db.Column(db.Float)
-    status = db.Column(db.String(50), default="Confirmed")  # ← ADD THIS
+    status = db.Column(db.String(50), default="Confirmed")
 
     user = db.relationship("User", back_populates="orders")
     items = db.relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
