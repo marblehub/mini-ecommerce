@@ -1,15 +1,20 @@
 from models.order import Order, OrderItem
+from models.user import db, User
+from models.product import PhysicalProduct, DigitalProduct, SubscriptionProduct
+from models.payment import CreditCard, PayPal, Bitcoin, BankTransfer
+from models.cart import Cart
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file, abort
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 import json
 from math import ceil
 from datetime import datetime, timedelta
-
 from config import Config
-from models.user import db, User
-from models.product import PhysicalProduct, DigitalProduct, SubscriptionProduct
-from models.payment import CreditCard, PayPal, Bitcoin, BankTransfer
-from models.cart import Cart
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from decimal import Decimal, ROUND_HALF_UP
+
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -40,7 +45,7 @@ def load_products():
         else:
             obj = SubscriptionProduct(p["id"], p["name"], p["price"], p["image"])
 
-        obj.rating = rating  # <-- add this line
+        obj.rating = rating
         product_objects[p["id"]] = obj
 
     return product_objects
@@ -49,14 +54,12 @@ def load_products():
 products = load_products()
 
 payments = {
-    "card": CreditCard(),
+    "credit/debit card": CreditCard(),
     "paypal": PayPal(),
     "bitcoin": Bitcoin(),
-    "banktransfer": BankTransfer()
+    "bank transfer": BankTransfer()
 }
 
-
-from math import ceil
 
 @app.route("/")
 @app.route("/page/<int:page>")
@@ -73,14 +76,20 @@ def index(page=1):
         "index.html",
         products=page_products,
         page=page,
+        cart=cart,
         total_pages=total_pages
     )
+
+
+@app.context_processor
+def inject_cart():
+    return dict(cart=cart)
 
 
 @app.route("/add/<int:product_id>")
 @login_required
 def add_to_cart(product_id):
-    product = products.get(product_id)  # use the dict directly
+    product = products.get(product_id)
     if product:
         cart.add(product)
         flash(f"{product.name} added to cart.")
@@ -94,14 +103,19 @@ def add_to_cart(product_id):
 @app.route("/cart")
 @login_required
 def view_cart():
-    return render_template(
-        "cart.html",
-        items=cart.list_items(),
-        total=cart.total(),
-        message=""
-    )
+	global vat, grand_total
+	
+	total=cart.total()
+	vat = round(total * 0.1, 2)
+	grand_total = round(total + vat, 2)
 
-
+	return render_template(
+		"cart.html",
+		items=cart.list_items(),
+		total=round(total, 2),
+		vat=vat,
+		grand_total=grand_total
+	)
 
 
 @app.route("/cart", methods=["POST"])
@@ -121,17 +135,21 @@ def checkout_cart():
     address = request.form.get("address")
     city = request.form.get("city")
     zip_code = request.form.get("zip")
+    country = request.form.get("country")
     delivery_company = request.form.get("delivery_company")
+    #payment_method = request.form.get("payment_method")
+    payment_method = payment_key.title()
 
-    if not all([address, city, zip_code, delivery_company]):
+    if not all([address, city, zip_code, country, delivery_company]):
         flash("Please fill all shipment details")
         return redirect(url_for("view_cart"))
 
     # Process payment
     total_amount = cart.total()
     payment.pay(total_amount)
-
-    # Delivery date
+    
+    # Order/Delivery date
+    order_date = datetime.now().strftime("%d-%m-%Y")
     delivery_date = (datetime.now() + timedelta(days=3)).strftime("%d-%m-%Y")
 
     # Create Order
@@ -140,22 +158,28 @@ def checkout_cart():
         address=address,
         city=city,
         zip_code=zip_code,
+        country=country,
         delivery_company=delivery_company,
+        order_date=order_date,
+        payment_method=payment_method,
         delivery_date=delivery_date,
         total=total_amount,
     )
 
     db.session.add(new_order)
-
-    # Save order items
+    
     for item in cart.items.values():
+        product = item["product"]
+
         order_item = OrderItem(
-            order=new_order,  # cleaner relationship usage
-            product_name=item["product"].name,
-            price=item["product"].price,
+            order=new_order,
+            product_name=product.name,
+            price=product.price,
             quantity=item["qty"],
+            product_image=product.image  # ← save image filename
         )
         db.session.add(order_item)
+
 
     # Commit everything at once
     db.session.commit()
@@ -164,14 +188,27 @@ def checkout_cart():
     cart.clear()
 
     return redirect(url_for("order_success", order_id=new_order.id))
-
-
+    
 
 @app.route("/success/<int:order_id>")
 @login_required
 def order_success(order_id):
     order = Order.query.get_or_404(order_id)
-    return render_template("success.html", order=order)
+
+    # Calculate subtotal
+    subtotal = sum(item.price * item.quantity for item in order.items)
+
+    # VAT and total
+    vat = round(subtotal * 0.1, 2)
+    grand_total = round(subtotal + vat, 2)
+
+    return render_template(
+        "success.html",
+        order=order,
+        total=round(subtotal, 2),
+        vat=vat,
+        grand_total=grand_total
+    )
 
 
 @app.route("/track", methods=["GET", "POST"])
@@ -205,11 +242,6 @@ def decrease_qty(product_id):
     return redirect(url_for("view_cart"))
 
 
-from reportlab.platypus import SimpleDocTemplate, Paragraph, ListItem, ListFlowable
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.styles import getSampleStyleSheet
-    
-
 @app.route("/invoice/<int:order_id>")
 @login_required
 def generate_invoice(order_id):
@@ -221,22 +253,83 @@ def generate_invoice(order_id):
     styles = getSampleStyleSheet()
     elements = []
 
-    elements.append(Paragraph(f"Invoice - Order {order.id}", styles["Title"]))
-    elements.append(Paragraph("Thank you for your purchase.", styles["Normal"]))
-    elements.append(Paragraph("Items:", styles["Heading2"]))
+    # --- Store Info ---
+    elements.append(Paragraph("<b>Mini Store</b><sup>™</sup>", styles["Title"]))
+    elements.append(Paragraph("123 Commerce Street", styles["Normal"]))
+    elements.append(Paragraph("Berlin, Germany", styles["Normal"]))
+    elements.append(Paragraph("Email: support@ministore.com", styles["Normal"]))
+    elements.append(Spacer(1, 15))
 
-    bullet_items = []
+    # --- Invoice Header ---
+    elements.append(Paragraph(f"<b>Invoice</b>", styles["Heading1"]))
+    elements.append(Paragraph(f"Invoice Number: {order.id}", styles["Normal"]))
+    elements.append(Paragraph(f"Order Date: {order.order_date}", styles["Normal"]))
+    elements.append(Spacer(1, 10))
+
+    # --- Customer / Shipping ---
+    elements.append(Paragraph("<b>Bill To:</b>", styles["Heading3"]))
+    elements.append(Paragraph(order.address, styles["Normal"]))
+    elements.append(Paragraph(f"{order.city}, {order.zip_code}", styles["Normal"]))
+    elements.append(Paragraph(order.country, styles["Normal"]))
+    elements.append(Spacer(1, 15))
+
+    # --- Item Table ---
+    table_data = [
+        ["Item", "Qty", "Unit Price (€)", "Total (€)"]
+    ]
+
+    subtotal = Decimal("0.00")
+
     for item in order.items:
-        text = f"{item.product_name} ×{item.quantity} — €{item.price}"
-        bullet_items.append(ListItem(Paragraph(text, styles["Normal"])))
+        unit_price = Decimal(str(item.price))
+        quantity = Decimal(str(item.quantity))
+        line_total = unit_price * quantity
+        subtotal += line_total
 
-    elements.append(ListFlowable(bullet_items))
-    elements.append(Paragraph(f"Total: €{order.total}", styles["Heading3"]))
+        table_data.append([
+            item.product_name,
+            str(item.quantity),
+            f"{unit_price:.2f}",
+            f"{line_total:.2f}"
+        ])
+
+    vat = (subtotal * Decimal("0.1")).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    grand_total = (subtotal + vat).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    # --- Totals rows ---
+    table_data.append(["", "", "Subtotal:", f"{subtotal:.2f}"])
+    table_data.append(["", "", "VAT (10%):", f"{vat:.2f}"])
+    table_data.append(["", "", "Total:", f"{grand_total:.2f}"])
+
+    table = Table(table_data, colWidths=[220, 60, 100, 100])
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
+        ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+        ("GRID", (0, 0), (-1, -1), 1, colors.black),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("ALIGN", (1, 1), (-1, -1), "CENTER"),
+        ("ALIGN", (2, 1), (-1, -1), "RIGHT"),
+        ("BACKGROUND", (0, -1), (-1, -1), colors.lightgrey),
+        ("FONTNAME", (0, -1), (-1, -1), "Helvetica-Bold"),
+    ]))
+
+    elements.append(table)
+    elements.append(Spacer(1, 20))
+
+    # --- Payment & Delivery ---
+    elements.append(Paragraph(f"<b>Payment Method:</b> {order.payment_method}", styles["Normal"]))
+    elements.append(Paragraph(f"<b>Delivery Company:</b> {order.delivery_company}", styles["Normal"]))
+    elements.append(Spacer(1, 15))
+
+    # --- Footer ---
+    elements.append(Paragraph(
+        "Thank you for shopping with Mini Store.",
+        styles["Italic"]
+    ))
 
     doc.build(elements)
 
     return send_file(file_path, as_attachment=True)
-
 
 
 # ---------- Auth ----------
@@ -295,7 +388,7 @@ def admin_dashboard():
     return render_template(
         "admin.html",
         orders=orders,
-        total_revenue=total_revenue
+        total_revenue=round(total_revenue, 2)
     )
 
 
@@ -325,7 +418,8 @@ def register_admin():
         db.session.commit()
 
         flash(f"Admin user '{username}' created successfully!")
-        return redirect(url_for("admin"))
+        #return redirect(url_for("admin"))
+        return render_template("admin.html")
 
     return render_template("register_admin.html")
 

@@ -56,17 +56,28 @@
                     {% for item in order.items %}
                     <tr>
                         <td>
-							<img src="{{ url_for('static', filename='images/' ~ (item.product_image or 'placeholder.png')) }}" alt="{{ item.product_name }}" class="img-thumbnail" style="width:60px; height:60px; object-fit:cover;">
+							<img src="{{ url_for('static', filename='images/' ~ (item.product_image or 'placeholder.png')) }}" class="img-fluid rounded" style="max-height:70px;">
                         </td>
                         <td>{{ item.product_name }}</td>
                         <td class="text-center">{{ item.quantity }}</td>
-                        <td class="text-end">€{{ item.price*item.quantity }}</td>
+                        <td class="text-end">€{{ "%.2f"|format(item.price * item.quantity) }}</td>
                     </tr>
                     {% endfor %}
-                    <tr class="table-light">
-                        <td colspan="3" class="text-end fw-bold">Total:</td>
-                        <td class="text-end fw-bold">€{{ order.total + 0.19*order.total}} <span style="font-style: italic; font-size: smaller;">(VAT inclusive.)</span></td>
-                    </tr>
+                    <tr>
+						<td colspan="3" class="text-end">Subtotal:</td>
+						<td class="text-end">€{{ total }}</td>
+					</tr>
+
+					<tr>
+						<td colspan="3" class="text-end">VAT (10%):</td>
+						<td class="text-end">€{{ vat }}</td>
+					</tr>
+
+					<tr class="table-light">
+						<td colspan="3" class="text-end fw-bold">Total:</td>
+						<td class="text-end fw-bold">€{{ grand_total }}</td>
+					</tr>
+
                 </tbody>
             </table>
         </div>
@@ -77,11 +88,12 @@
             <div class="col-md-6">
                 <p class="mb-1"><strong>Address:</strong> {{ order.address }}</p>
                 <p class="mb-1"><strong>City / ZIP:</strong> {{ order.city }}, {{ order.zip_code }}</p>
-                <p class="mb-1"><strong>Courier:</strong> {{ order.delivery_company }}</p>
+                <p class="mb-1"><strong>Country:</strong> {{ order.country }}</p>
             </div>
             <div class="col-md-6">
+				<p class="mb-1"><strong>Courier:</strong> {{ order.delivery_company }}</p>
                 <p class="mb-1"><strong>Estimated Delivery:</strong> {{ order.delivery_date }}</p>
-                <p class="mb-1"><strong>Payment Method:</strong> {{ order.payment_method | default('N/A') }}</p>
+                <p class="mb-1"><strong>Payment Method:</strong> {{ order.payment_method | default('N/A')}}</p>
             </div>
         </div>
 

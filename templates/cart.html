@@ -10,21 +10,21 @@
 
     {% if items %}
 		{% for item in items %}
-	<div class="cart-item">
-		<img src="/static/images/{{ item.image }}" class="thumb">
+			<div class="cart-item d-flex align-items-center">
+				<img src="/static/images/{{ item.image }}" class="thumb me-3">
 
-		<div class="item-info">
-			<h4>{{ item.name }}</h4>
-			<p class="item-price">€{{ item.price }}</p>
+				<div class="item-info flex-grow-1">
+					<h5 class="item-name">{{ item.name }}</h5>
+					<p class="item-price mb-2">Unit Price: €{{ item.price }}</p>
 
-			<div class="qty-controls">
-				<a href="/cart/decrease/{{ item.id }}" class="qty-btn">−</a>
-				<span class="qty-number">{{ item.qty }}</span>
-				<a href="/cart/increase/{{ item.id }}" class="qty-btn">+</a>
+					<div class="qty-controls">
+						<a href="/cart/decrease/{{ item.id }}" class="qty-btn">−</a>
+						<span class="qty-number">{{ item.qty }}</span>
+						<a href="/cart/increase/{{ item.id }}" class="qty-btn">+</a>
+					</div>
+				</div>
 			</div>
-		</div>
-	</div>
-	{% endfor %}
+		{% endfor %}
 
     {% else %}
         <p>Your cart is empty.</p>
@@ -41,21 +41,22 @@
             <input type="text" name="address" placeholder="Street address" required>
             <input type="text" name="city" placeholder="City" required>
             <input type="text" name="zip" placeholder="ZIP code" required>
+            <input type="text" name="country" placeholder="Country" required>
         </div>
 
         <h3 class="section-title">Delivery company</h3>
         <select name="delivery_company" class="select-field">
+            <option>Amazon</option>
             <option>DHL</option>
-            <option>UPS</option>
             <option>FedEx</option>
             <option>Hermes</option>
-            <option>Amazon</option>
+            <option>UPS</option>
         </select>
 
         <h3 class="section-title">Payment method</h3>
         <div class="payment-options">
             <label>
-                <input type="radio" name="payment" value="card" checked>
+                <input type="radio" name="payment" value="credit/debit card" checked>
                 Credit/Debit Card
             </label>
             <label>
@@ -67,7 +68,7 @@
                 Bitcoin
             </label>
             <label>
-                <input type="radio" name="payment" value="banktransfer">
+                <input type="radio" name="payment" value="bank transfer">
                 Bank Transfer
             </label>
         </div>
@@ -80,27 +81,27 @@
     <div class="summary-box">
         <h3>Order Summary</h3>
 
-        <div class="summary-row">
-            <span>Items:</span>
-            <span>€{{ total }}</span>
-        </div>
+			<div class="summary-row">
+				<span>Items:</span>
+				<span>€{{ total }}</span>
+			</div>
 
-        <div class="summary-row">
-            <span>Shipping:</span>
-            <span>Free</span>
-        </div>
-        
-        <div class="summary-row">
-            <span>VAT(19%):</span>
-            <span>€{{ 0.19*total }}</span>
-        </div>
+			<div class="summary-row">
+				<span>Shipping:</span>
+				<span>Free</span>
+			</div>
 
-        <hr>
+			<div class="summary-row">
+				<span>VAT (10%):</span>
+				<span>€{{ vat }}</span>
+			</div>
 
-        <div class="summary-total">
-            <span>Total:</span>
-            <span>€{{ total + 0.19*total }}</span>
-        </div>
+			<hr>
+
+			<div class="summary-total">
+				<span>Total:</span>
+				<span>€{{ grand_total }}</span>
+			</div>
 
         <button type="submit" class="place-order-btn">
             Place your order

@@ -105,7 +105,7 @@ a:hover {
 
 .checkout-left {
     flex: 2;
-    background: white;
+    background: #e1effa;
     padding: 25px;
     border-radius: 8px;
     border: 1px solid #ddd;
@@ -210,6 +210,7 @@ a:hover {
 }
 
 
+/*
 .thumb {
     width: 70px;
     height: 70px;
@@ -223,6 +224,7 @@ a:hover {
     padding: 15px 0;
     border-bottom: 1px solid #eee;
 }
+*/
 
 .qty-controls {
     display: flex;
@@ -237,4 +239,32 @@ a:hover {
     text-decoration: none;
     font-weight: bold;
     color: #111;
+}
+
+/* ===== 2-column checkout field ===== */
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.thumb {
+    width: 80px;
+    height: 80px;
+    object-fit: fit;
+    border-radius: 8px;
+}
+
+.item-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.item-name {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
 }

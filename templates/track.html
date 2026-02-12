@@ -51,15 +51,15 @@
         <!-- Delivery Info -->
         <div class="row mt-4">
             <div class="col-md-6">
-                <h5>Shipping Address</h5>
+                <h4>Shipping Address</h4>
                 <p>
                     {{ order.address }}<br>
-                    {{ order.city }}, {{ order.zip_code }}
+                    {{ order.city }}, {{ order.zip_code }}, {{ order.country }}
                 </p>
             </div>
 
             <div class="col-md-6">
-                <h5>Delivery Info</h5>
+                <h4>Delivery Info</h4>
                 <p>
                     <strong>Courier:</strong> {{ order.delivery_company }}<br>
                     <strong>Estimated Delivery:</strong> {{ order.delivery_date }}
