@@ -30,7 +30,9 @@
         <p>Your cart is empty.</p>
     {% endif %}
 
-    <a href="/" class="continue-shopping">← Continue shopping</a>
+    <a href="{{ url_for('index') }}" class="btn btn-outline-primary">
+        ← Continue Shopping
+      </a>
 
     <hr>
 

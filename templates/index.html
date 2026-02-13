@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 
+<h3 class="greeting">{{ greeting }}</h3>
+
 <div class="container my-5">
     <h2 class="mb-4 text-center">Our Products</h2>
 
@@ -14,13 +16,18 @@
                 <div class="col-md-4 mb-4 d-flex justify-content-center">
                     <div class="card h-100 text-center" style="width: 400px;">
                         <!-- Product Image -->
+						<a href="{{ url_for('product_detail', product_id=product.id) }}">
                         <img src="/static/images/{{ product.image or 'placeholder.png' }}" 
-                             alt="{{ product.name }}" class="img-thumbnail" 
+                             alt="{{ product.name }}" class="img-thumbnail card-img-top" 
                              style="width:330px; height:300px; margin:auto; display:block;">
+                        </a>
 
                         <div class="card-body">
                             <!-- Product Name & Price -->
-                            <h5 class="card-title">{{ product.name }}</h5>
+                            <h5 class="card-title">
+                            <a href="{{ url_for('product_detail', product_id=product.id) }}">{{ product.name }}
+							</a>
+                            </h5>
                             <p class="card-text">€{{ product.price }}</p>
 
                             <!-- Star Rating -->
@@ -36,7 +43,7 @@
 
                             <!-- Action Button -->
                             {% if current_user.is_authenticated %}
-                                <a href="/add/{{ product.id }}" class="btn btn-primary btn-sm">
+                                <a href="/adds/{{ product.id }}" class="btn btn-primary btn-sm">
                                     Add to Cart
                                 </a>
                             {% else %}

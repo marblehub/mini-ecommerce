@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+<a href="{{ url_for('index') }}" class="btn btn-outline-primary">
+        Continue Shopping
+</a>
+
+
+<div class="container my-5">
+    <div class="row">
+
+        <!-- LEFT: Product Image -->
+        <div class="col-md-4 text-center">
+            <img src="{{ url_for('static', filename='images/' ~ product.image) }}"
+                 class="img-fluid border rounded"
+                 style="max-height:400px; object-fit:contain;">
+        </div>
+
+        <!-- MIDDLE: Product Details -->
+        <div class="col-md-4">
+            <h3 class="fw-bold">{{ product.name }}</h3>
+
+            <!-- Star rating -->
+            <div class="mb-2">
+                {% for i in range(product.rating|int) %}
+                    <i class="bi bi-star-fill text-warning"></i>
+                {% endfor %}
+                {% for i in range(5 - product.rating|int) %}
+                    <i class="bi bi-star text-warning"></i>
+                {% endfor %}
+            </div>
+
+            <p class="text-muted">
+                Premium quality product with excellent performance and durability.
+            </p>
+
+            <ul>
+                <li>High quality materials</li>
+                <li>Fast delivery</li>
+                <li>30-day return policy</li>
+                <li>Need support? Write us.</li>
+            </ul>
+        </div>
+
+        <!-- RIGHT: Purchase Box -->
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3">
+
+                <h4 class="text-success fw-bold">€{{ "%.2f"|format(product.price) }}</h4>
+
+                <p class="mb-1">
+                    <strong>Delivery:</strong> FREE
+                </p>
+
+                <p class="text-success">
+                    Arrives in 3–5 days (excluding holidays.)
+                </p>
+
+                <!-- Quantity -->
+                <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}">
+
+					<!-- Quantity -->
+					<label class="form-label">Quantity:</label>
+					<select name="quantity" class="form-select mb-3">
+						{% for i in range(1,11) %}
+						<option value="{{ i }}">{{ i }}</option>
+						{% endfor %}
+					</select>
+
+					<!-- Buttons -->
+					<button type="submit" class="btn btn-warning w-100 mb-2">
+						Add to Cart
+					</button>
+
+				</form>
+
+				<a href="{{ url_for('checkout_cart', product_id=product.id) }}"
+				   class="btn btn-primary w-100 mb-3">
+					Buy Now
+				</a>
+
+				{% if cart.items %}
+				<a href="{{ url_for('view_cart') }}"
+				   class="btn btn-success w-100">
+					Proceed to Checkout
+				</a>
+				{% endif %}
+
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

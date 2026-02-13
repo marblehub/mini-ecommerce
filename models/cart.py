@@ -3,11 +3,25 @@ class Cart:
         # items stored as {product_id: {"product": obj, "qty": int}}
         self.items = {}
 
-    def add(self, product):
+    def adds(self, product):
         if product.id in self.items:
             self.items[product.id]["qty"] += 1
         else:
             self.items[product.id] = {"product": product, "qty": 1}
+    
+    
+    def add(self, product, quantity=1):
+        product_id = product.id
+
+        if product_id in self.items:
+            self.items[product_id]["qty"] += quantity
+        else:
+            self.items[product_id] = {
+                "product": product,
+                "qty": quantity
+            }
+
+    
 
     def remove(self, product_id):
         if product_id in self.items:

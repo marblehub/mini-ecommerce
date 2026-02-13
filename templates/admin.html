@@ -23,6 +23,7 @@
                             <th>User</th>
                             <th>Total</th>
                             <th>Courier</th>
+                            <th>Purchase Date</th>
                             <th>Delivery Date</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -32,9 +33,19 @@
                         {% for order in orders %}
                         <tr>
                             <td>#{{ order.id }}</td>
-                            <td>{{ order.user.email }}</td>
-                            <td>€{{ order.total }}</td>
+                            
+                            <td>
+								{% if order.user %}
+									{{ order.user.username }}
+								{% else %}
+									Guest
+								{% endif %}
+							</td>
+
+                            
+                            <td>€{{ "%.2f"|format(order.total) }}</td>
                             <td>{{ order.delivery_company }}</td>
+                            <td>{{ order.order_date }}</td>
                             <td>{{ order.delivery_date }}</td>
 
                             <!-- Status dropdown -->
@@ -54,13 +65,15 @@
 
                             <!-- Delete button -->
                             <td>
-                                <form method="POST" action="/admin/delete_order/{{ order.id }}">
-                                    <button class="btn btn-sm btn-danger"
-                                            onclick="return confirm('Delete this order?')">
-                                        Delete
-                                    </button>
-                                </form>
-                            </td>
+								<form method="POST" action="/admin/delete_order/{{ order.id }}">
+									<button class="btn btn-sm btn-outline-danger"
+											onclick="return confirm('Delete this order?')"
+											title="Delete Order">
+										<i class="bi bi-trash"></i>
+									</button>
+								</form>
+							</td>
+
                         </tr>
                         {% endfor %}
                     </tbody>

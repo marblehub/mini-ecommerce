@@ -3,6 +3,7 @@ from models.user import db, User
 from models.product import PhysicalProduct, DigitalProduct, SubscriptionProduct
 from models.payment import CreditCard, PayPal, Bitcoin, BankTransfer
 from models.cart import Cart
+from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file, abort
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 import json
@@ -25,6 +26,17 @@ login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
 cart = Cart()
+
+def admin_required(func):
+    @wraps(func)
+    @login_required
+    def wrapper(*args, **kwargs):
+        if not current_user.is_admin:
+            flash("Access denied. Admins only.")
+            return redirect(url_for("index"))
+        return func(*args, **kwargs)
+    return wrapper
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -72,12 +84,31 @@ def index(page=1):
     end = start + per_page
     page_products = all_products[start:end]
 
+    # Determine greeting based on time
+    hour = datetime.now().hour
+    if hour < 12:
+        greeting = "Good morning"
+    elif hour < 18:
+        greeting = "Good afternoon"
+    else:
+        greeting = "Good evening"
+
+    # Determine username
+    if current_user.is_authenticated:
+        name = current_user.username
+    else:
+        name = "Guest"
+
+    full_greeting = f"{greeting}, {name.title()}!"
+
     return render_template(
         "index.html",
         products=page_products,
         page=page,
         cart=cart,
-        total_pages=total_pages
+        total_pages=total_pages,
+        greeting=full_greeting,
+        name=name
     )
 
 
@@ -86,16 +117,48 @@ def inject_cart():
     return dict(cart=cart)
 
 
-@app.route("/add/<int:product_id>")
+@app.route("/product/<int:product_id>")
+def product_detail(product_id):
+    product = products.get(product_id)
+
+    if not product:
+        abort(404)
+
+    return render_template(
+        "product_detail.html",
+        product=product,
+        cart=cart
+    )
+
+
+
+@app.route("/adds/<int:product_id>")
 @login_required
-def add_to_cart(product_id):
+def add_to_cart_s(product_id):
     product = products.get(product_id)
     if product:
         cart.add(product)
-        flash(f"{product.name} added to cart.")
+        flash(f"'{product.name}' added to cart.", "success")
+    else:
+        #flash("Product not found.")
+        flash("Product not found.", "danger")
+    return redirect(url_for("product_detail", product_id=product_id))
+
+
+@app.route("/add/<int:product_id>", methods=["POST"])
+@login_required
+def add_to_cart(product_id):
+    product = products.get(product_id)
+
+    if product:
+        quantity = int(request.form.get("quantity", 1))
+        cart.add(product, quantity)
+        flash(f"{product.name} (x{quantity}) added to cart.")
     else:
         flash("Product not found.")
-    return redirect(url_for("index"))
+
+    return redirect(url_for("product_detail", product_id=product_id))
+
 
 
 # ---------- Cart routes ----------
@@ -137,10 +200,9 @@ def checkout_cart():
     zip_code = request.form.get("zip")
     country = request.form.get("country")
     delivery_company = request.form.get("delivery_company")
-    #payment_method = request.form.get("payment_method")
     payment_method = payment_key.title()
 
-    if not all([address, city, zip_code, country, delivery_company]):
+    if not all([address, city, zip_code, country, delivery_company, payment_method]):
         flash("Please fill all shipment details")
         return redirect(url_for("view_cart"))
 
@@ -217,6 +279,7 @@ def track_order():
     if request.method == "POST":
         order_id = request.form.get("order_id")
         order = Order.query.get(order_id)
+        
     return render_template("track.html", order=order)
 
 
@@ -344,7 +407,7 @@ def register():
 
         db.session.add(user)
         db.session.commit()
-        flash("Account created.")
+        flash("Account successfully created.")
         return redirect(url_for("login"))
 
     return render_template("register.html")
@@ -371,16 +434,17 @@ def login():
 @login_required
 def logout():
     logout_user()
+    flash("Logged Out. Kindly login to continue shopping.")
     return redirect(url_for("index"))
 
 
 # ---------- Admin ----------
 @app.route("/admin")
-@login_required
+@admin_required
 def admin_dashboard():
-    if not current_user.is_admin:
-        flash("Access denied")
-        return redirect(url_for("index"))
+    # if not current_user.is_admin:
+        # flash("Access denied")
+        # return redirect(url_for("index"))
 
     orders = Order.query.order_by(Order.id.desc()).all()
     total_revenue = sum(order.total for order in orders)
@@ -393,12 +457,12 @@ def admin_dashboard():
 
 
 @app.route("/register-admin", methods=["GET", "POST"])
-@login_required
+@admin_required
 def register_admin():
     # Only allow current admin users
-    if not current_user.is_admin:
-        flash("Access denied: only admins can create new admins.")
-        return redirect(url_for("index"))
+    # if not current_user.is_admin:
+        # flash("Access denied: only admins can create new admins.")
+        # return redirect(url_for("index"))
 
     if request.method == "POST":
         username = request.form["username"]
@@ -425,11 +489,11 @@ def register_admin():
 
 
 @app.route("/admin/update_status/<int:order_id>", methods=["POST"])
-@login_required
+@admin_required
 def update_order_status(order_id):
-    if not current_user.is_admin:
-        flash("Access denied")
-        return redirect(url_for("index"))
+    # if not current_user.is_admin:
+        # flash("Access denied")
+        # return redirect(url_for("index"))
 
     order = Order.query.get_or_404(order_id)
     new_status = request.form.get("status")
@@ -442,11 +506,11 @@ def update_order_status(order_id):
 
 
 @app.route("/admin/delete_order/<int:order_id>", methods=["POST"])
-@login_required
+@admin_required
 def delete_order(order_id):
-    if not current_user.is_admin:
-        flash("Access denied")
-        return redirect(url_for("index"))
+    # if not current_user.is_admin:
+        # flash("Access denied")
+        # return redirect(url_for("index"))
 
     order = Order.query.get_or_404(order_id)
     db.session.delete(order)
@@ -454,6 +518,13 @@ def delete_order(order_id):
 
     flash(f"Order #{order.id} deleted")
     return redirect(url_for("admin_dashboard"))
+
+
+@app.route("/my-orders")
+@login_required
+def my_orders():
+    orders = current_user.orders
+    return render_template("my_orders.html", orders=orders)
 
 
 if __name__ == "__main__":
