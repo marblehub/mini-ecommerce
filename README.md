@@ -49,7 +49,6 @@ Create an admin user via the registration route or script.
 ## Screenshots
 ![Home](static/images/screenshots/home.png)
 ![Home](static/images/screenshots/home-loggedin.png)
-![Admin](static/images/screenshots/admin-page.png)
 ![Admin](static/images/screenshots/admin-dashboard.png)
 
 ## Future Improvements
